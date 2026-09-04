@@ -1,18 +1,44 @@
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run `npm run deploy` to publish your worker
- *
- * Bind resources to your worker in `wrangler.jsonc`. After adding bindings, a type definition for the
- * `Env` object can be regenerated with `npm run cf-typegen`.
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
-
 export default {
-	async fetch(request, env, ctx): Promise<Response> {
-		return new Response("Hello World!");
+	async fetch(request, env): Promise<Response> {
+		const url = new URL(request.url);
+
+		if (url.pathname === "/api/properties" && request.method === "GET") {
+			const result = await env.property_management_db
+				.prepare(
+					`SELECT
+            id,
+            name,
+            address,
+            city,
+            province,
+            postal_code,
+            total_units
+          FROM properties
+          ORDER BY id`
+				)
+				.all();
+
+			return Response.json(result.results);
+		}
+
+		if (url.pathname === "/api/units" && request.method === "GET") {
+			const result = await env.property_management_db
+				.prepare(
+					`SELECT
+            units.id,
+            units.property_id,
+            units.unit_number,
+            owners.first_name || ' ' || owners.last_name AS owner_name,
+            units.is_rented
+          FROM units
+          JOIN owners ON units.owner_id = owners.id
+          ORDER BY units.id`
+				)
+				.all();
+
+			return Response.json(result.results);
+		}
+
+		return new Response("Not Found", { status: 404 });
 	},
 } satisfies ExportedHandler<Env>;
