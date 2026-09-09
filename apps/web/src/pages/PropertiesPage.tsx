@@ -38,28 +38,62 @@ function PropertiesPage() {
 
     return (
         <div className="space-y-6">
-            <h1>Properties</h1>
-
-            <h2 className="text-2xl font-semibold">{property.name}</h2>
-
-            <div className="rounded-lg bg-white p-6 shadow space-y-1">
-                <p>{property.address}</p>
-                <p>
-                    {property.city}, {property.province} {property.postal_code}
+            <div>
+                <h1 className="text-3xl font-bold">Properties</h1>
+                <p className="text-gray-500">
+                    Manage your properties and units
                 </p>
-                <p>{property.total_units} units</p>
             </div>
 
-            <h3 className="text-xl font-semibold">Units</h3>
+            <div className="rounded-lg bg-white p-6 shadow">
+                <h2 className="text-2xl font-semibold">{property.name}</h2>
 
-            <div className="space-y-4">
-                {units.map((unit) => (
-                    <div key={unit.id} className="rounded-lg bg-white p-4 shadow">
-                        <p>Unit {unit.unit_number}</p>
-                        <p>Owner: {unit.owner_name}</p>
-                        <p>Rented: {unit.is_rented ? 'Yes' : 'No'}</p>
-                    </div>
-                ))}
+                <p className="mt-2 text-gray-600">
+                    {property.address}
+                </p>
+
+                <p className="text-gray-600">
+                    {property.city}, {property.province}{' '}
+                    {property.postal_code}
+                </p>
+
+                <p className="mt-3 font-medium">
+                    {property.total_units} units
+                </p>
+            </div>
+
+            <div>
+                <h3 className="mb-4 text-xl font-semibold">Units</h3>
+
+                <div className="overflow-hidden rounded-lg bg-white shadow">
+                    <table className="w-full">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="px-6 py-3 text-left">Unit</th>
+                                <th className="px-6 py-3 text-left">Owner</th>
+                                <th className="px-6 py-3 text-left">Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {units.map((unit) => (
+                                <tr key={unit.id} className="border-t">
+                                    <td className="px-6 py-4">
+                                        {unit.unit_number}
+                                    </td>
+
+                                    <td className="px-6 py-4">
+                                        {unit.owner_name}
+                                    </td>
+
+                                    <td className="px-6 py-4">
+                                        {unit.is_rented ? 'Rented' : 'Available'}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     )
