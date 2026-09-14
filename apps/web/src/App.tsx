@@ -5,6 +5,7 @@ import PropertiesPage from './pages/PropertiesPage'
 import TenantsPage from './pages/TenantsPage'
 import LeasesPage from './pages/LeasesPage'
 import MaintenancePage from './pages/MaintenancePage'
+import UnitDetailsPage from './pages/UnitDetailsPage'
 import './App.css'
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
       <Route element={<DashboardLayout />}>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/properties" element={<PropertiesPage />} />
+        <Route path="/properties/units/:unitId" element={<UnitDetailsPage />} />
         <Route path="/tenants" element={<TenantsPage />} />
         <Route path="/leases" element={<LeasesPage />} />
         <Route path="/maintenance" element={<MaintenancePage />} />
