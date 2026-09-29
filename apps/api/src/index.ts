@@ -38,7 +38,22 @@ export default {
 
 			return Response.json(result.results);
 		}
+		if (url.pathname === "/api/tenants" && request.method === "GET") {
+			const result = await env.property_management_db
+				.prepare(
+					`SELECT
+        id,
+        first_name,
+        last_name,
+        email,
+        phone
+      FROM tenants
+      ORDER BY id`
+				)
+				.all();
 
+			return Response.json(result.results);
+		}
 		if (url.pathname.startsWith("/api/units/") && request.method === "GET") {
 			const unitId = url.pathname.split("/").pop()
 
@@ -67,6 +82,57 @@ export default {
 			}
 
 			return Response.json(result)
+		}
+		if (url.pathname.startsWith("/api/tenants/") && request.method === "GET") {
+			const tenantId = url.pathname.split("/").pop()
+
+			const result = await env.property_management_db
+				.prepare(
+					`SELECT
+        id,
+        first_name,
+        last_name,
+        email,
+        phone
+      FROM tenants
+      WHERE id = ?`
+				)
+				.bind(tenantId)
+				.first()
+
+			if (!result) {
+				return Response.json(
+					{ error: "Tenant not found" },
+					{ status: 404 }
+				)
+			}
+
+			return Response.json(result)
+		}
+		if (url.pathname === "/api/dashboard" && request.method === "GET") {
+			const properties = await env.property_management_db
+				.prepare("SELECT COUNT(*) AS total FROM properties")
+				.first()
+
+			const units = await env.property_management_db
+				.prepare("SELECT COUNT(*) AS total FROM units")
+				.first()
+
+			const rented = await env.property_management_db
+				.prepare("SELECT COUNT(*) AS total FROM units WHERE is_rented = 1")
+				.first()
+
+			const tenants = await env.property_management_db
+				.prepare("SELECT COUNT(*) AS total FROM tenants")
+				.first()
+
+			return Response.json({
+				properties: properties?.total ?? 0,
+				units: units?.total ?? 0,
+				rented: rented?.total ?? 0,
+				available: Number(units?.total ?? 0) - Number(rented?.total ?? 0),
+				tenants: tenants?.total ?? 0,
+			})
 		}
 		return new Response("Not Found", { status: 404 });
 	},
